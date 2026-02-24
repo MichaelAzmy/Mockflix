@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockflix — Membership</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+
+  <div class="container">
+    <section class="hero">
+      <h1 class="h-title">Membership</h1>
+      <p class="h-sub">Manage plan, billing provider, and cancellation options.</p>
+    </section>
+
+    <div class="card panel loading-wrap" id="page">
+      <div class="spinner"><div class="spin" aria-label="Loading"></div></div>
+
+      <div class="content">
+        <div id="membershipSummary"></div>
+
+        <div class="hr"></div>
+        <div id="providerBlock"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    Mockflix.requireLogin();
+    Mockflix.injectTopbar("account");
+    Mockflix.applyProviderParamIfPresent();
+
+    const s = Mockflix.loadState();
+    const providerBlock = document.getElementById("providerBlock");
+
+    function render() {
+      const st = Mockflix.loadState();
+      Mockflix.renderMembershipSummary();
+
+      if (st.billingProvider !== "direct") {
+        providerBlock.innerHTML = `
+          <div class="notice">
+            <strong>Heads up:</strong> Your membership is billed through <strong>${st.billingProvider}</strong>.
+            To cancel, you’ll need to manage your subscription with that provider.
+          </div>
+          <div class="footer-actions">
+            <a class="btn btn-ghost" href="account.html">Back to account</a>
+          </div>
+        `;
+        return;
+      }
+
+      // direct billing: show controls based on status
+      if (st.subscriptionStatus === "active") {
+        providerBlock.innerHTML = `
+          <h2>Options</h2>
+          <p class="muted">You can pause or cancel your membership. Changes take effect at the end of your current period.</p>
+
+          <div class="footer-actions">
+            <a class="btn btn-ghost" href="pause.html" data-testid="pause-cta">Pause for 1 month</a>
+            <a class="btn-link" href="cancel.html" data-testid="cancel-membership">Cancel membership</a>
+          </div>
+        `;
+      } else if (st.subscriptionStatus === "paused") {
+        providerBlock.innerHTML = `
+          <h2>Options</h2>
+          <p class="muted">Your membership is currently paused. You can resume or cancel.</p>
+          <div class="footer-actions">
+            <button class="btn btn-ghost" id="resumeBtn" aria-label="Resume membership">Resume membership</button>
+            <a class="btn-link" href="cancel.html" data-testid="cancel-membership">Cancel membership</a>
+          </div>
+        `;
+        document.getElementById("resumeBtn").addEventListener("click", async (e) => {
+          Mockflix.disableBriefly(e.currentTarget);
+          Mockflix.setLoading("page");
+          await Mockflix.realisticDelay();
+          Mockflix.setState({ subscriptionStatus: "active" });
+          render();
+          Mockflix.clearLoading("page");
+        });
+      } else {
+        const end = Mockflix.fmtDate(st.renewalDateISO);
+        providerBlock.innerHTML = `
+          <h2>Membership cancelled</h2>
+          <p class="muted">You can keep watching until <strong>${end}</strong>. Want to come back?</p>
+          <div class="footer-actions">
+            <button class="btn" id="restartBtn" data-testid="restart-membership">Restart membership</button>
+          </div>
+        `;
+        document.getElementById("restartBtn").addEventListener("click", async (e) => {
+          Mockflix.disableBriefly(e.currentTarget);
+          Mockflix.setLoading("page");
+          await Mockflix.realisticDelay();
+          Mockflix.setState({ subscriptionStatus: "active" });
+          window.location.href = "account.html" + (Mockflix.isTestMode() ? "?test=1" : "");
+        });
+      }
+    }
+
+    Mockflix.setLoading("page");
+    Mockflix.realisticDelay().then(() => {
+      render();
+      Mockflix.clearLoading("page");
+    });
+  </script>
+</body>
+</html>

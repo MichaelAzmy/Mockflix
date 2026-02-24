@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockflix — Pause</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+
+  <div class="container">
+    <section class="hero">
+      <h1 class="h-title">Pause membership</h1>
+      <p class="h-sub">Take a short break — you can resume anytime.</p>
+    </section>
+
+    <div class="card panel loading-wrap" id="page">
+      <div class="spinner"><div class="spin" aria-label="Loading"></div></div>
+
+      <div class="content">
+        <div class="notice">
+          Pausing keeps your account settings, profiles, and watch history.
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="footer-actions">
+          <a class="btn btn-ghost left" href="membership.html">Back</a>
+          <button class="btn" id="pauseBtn" data-testid="pause-1-month">Pause for 1 month</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    Mockflix.requireLogin();
+    Mockflix.injectTopbar("account");
+
+    const s = Mockflix.loadState();
+    if (s.billingProvider !== "direct") window.location.href = "membership.html";
+
+    document.getElementById("pauseBtn").addEventListener("click", async (e) => {
+      Mockflix.disableBriefly(e.currentTarget);
+      Mockflix.setLoading("page");
+      await Mockflix.realisticDelay();
+      Mockflix.setState({ subscriptionStatus: "paused" });
+      window.location.href = "membership.html" + (Mockflix.isTestMode() ? "?test=1" : "");
+    });
+
+    Mockflix.setLoading("page");
+    Mockflix.realisticDelay().then(() => Mockflix.clearLoading("page"));
+  </script>
+</body>
+</html>

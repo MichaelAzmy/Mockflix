@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockflix — Account</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+
+  <div class="container">
+    <section class="hero">
+      <h1 class="h-title">Account</h1>
+      <p class="h-sub">Membership, billing, security, and preferences.</p>
+    </section>
+
+    <div class="row">
+      <div class="col">
+        <div class="card panel loading-wrap" id="page">
+          <div class="spinner"><div class="spin" aria-label="Loading"></div></div>
+          <div class="content">
+            <h2>Membership & Billing</h2>
+            <div id="membershipSummary"></div>
+
+            <div class="footer-actions">
+              <a class="btn" href="membership.html" data-testid="manage-membership">Manage membership</a>
+            </div>
+
+            <div class="hr"></div>
+            <h2>Security</h2>
+            <div class="kv"><div class="k">Password</div><div class="v">Last changed: —</div></div>
+            <div class="kv"><div class="k">Two-factor</div><div class="v">Not enabled</div></div>
+
+            <div class="hr"></div>
+            <h2>Profiles</h2>
+            <div class="kv"><div class="k">Primary profile</div><div class="v">Default</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card panel">
+          <h2>Support</h2>
+          <p class="muted" style="margin-top:8px;">
+            This is a mock website used to test cancellation flows. It intentionally includes
+            retention prompts and branching behavior.
+          </p>
+          <div class="hr"></div>
+          <p class="small muted">
+            Deterministic mode: append <strong>?test=1</strong> to URLs to reduce random delays.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    Mockflix.requireLogin();
+    Mockflix.injectTopbar("account");
+
+    Mockflix.setLoading("page");
+    Mockflix.realisticDelay().then(() => {
+      Mockflix.renderMembershipSummary();
+      Mockflix.clearLoading("page");
+    });
+  </script>
+</body>
+</html>

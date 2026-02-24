@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockflix — Cancel</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+
+  <div class="container">
+    <section class="hero">
+      <h1 class="h-title">Before you go…</h1>
+      <p class="h-sub">A couple options that might work better.</p>
+    </section>
+
+    <div class="card panel loading-wrap" id="page">
+      <div class="spinner"><div class="spin" aria-label="Loading"></div></div>
+
+      <div class="content">
+        <div class="row">
+          <div class="col">
+            <div class="notice">
+              <strong>Try a lower plan</strong><br/>
+              Keep watching with fewer features at a lower price.
+              <div style="margin-top:10px;">
+                <button class="btn btn-ghost" id="downgradeBtn" data-testid="retention-downgrade">Switch to Basic</button>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="notice">
+              <strong>Pause for 1 month</strong><br/>
+              Take a short break — resume anytime.
+              <div style="margin-top:10px;">
+                <a class="btn btn-ghost" href="pause.html" data-testid="retention-pause">Pause instead</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <p class="muted">
+          If you still want to cancel, you can continue below.
+        </p>
+
+        <div class="footer-actions">
+          <a class="btn btn-ghost left" href="membership.html">Back</a>
+          <a class="btn-link" href="cancel-reason.html" data-testid="continue-to-cancel">Continue to cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    Mockflix.requireLogin();
+    Mockflix.injectTopbar("account");
+
+    const s = Mockflix.loadState();
+    if (s.billingProvider !== "direct") window.location.href = "membership.html";
+
+    document.getElementById("downgradeBtn").addEventListener("click", async (e) => {
+      Mockflix.disableBriefly(e.currentTarget);
+      Mockflix.setLoading("page");
+      await Mockflix.realisticDelay();
+      Mockflix.setState({ plan: "Basic" });
+      window.location.href = "membership.html" + (Mockflix.isTestMode() ? "?test=1" : "");
+    });
+
+    Mockflix.setLoading("page");
+    Mockflix.realisticDelay().then(() => Mockflix.clearLoading("page"));
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockflix — Sign In</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1 class="h-title">Sign in to Mockflix</h1>
+      <p class="h-sub">Manage your membership, billing, and preferences.</p>
+    </section>
+
+    <div class="card panel loading-wrap" id="page">
+      <div class="spinner"><div class="spin" aria-label="Loading"></div></div>
+
+      <div class="content">
+        <form class="form" id="loginForm">
+          <div>
+            <label for="email">Email</label>
+            <input id="email" type="email" autocomplete="email" placeholder="you@example.com"
+              data-testid="login-email" required />
+          </div>
+          <div>
+            <label for="pw">Password</label>
+            <input id="pw" type="password" autocomplete="current-password" placeholder="••••••••"
+              data-testid="login-password" required />
+          </div>
+
+          <div class="footer-actions">
+            <span class="small muted left">Any credentials work. This is a mock environment.</span>
+            <button class="btn" type="submit" data-testid="login-submit">Sign In</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="notice small">
+            Optional realism: after signing in, you can test provider billing by opening
+            <strong>membership.html?provider=apple</strong> (or google/partner).
+            Add <strong>?test=1</strong> to disable random delays.
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const s = Mockflix.loadState();
+    if (s.loggedIn) window.location.href = "browse.html";
+
+    const page = document.getElementById("page");
+    Mockflix.setLoading("page");
+    Mockflix.realisticDelay().then(() => Mockflix.clearLoading("page"));
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = e.submitter;
+      Mockflix.disableBriefly(btn);
+      Mockflix.setLoading("page");
+      await Mockflix.realisticDelay();
+
+      // Initialize state on login
+      Mockflix.setState({
+        loggedIn: true,
+        // keep existing state if already present; don't overwrite if user customized
+      });
+
+      // ensure state exists
+      const next = Mockflix.loadState();
+      if (!next.subscriptionStatus) Mockflix.setState({ subscriptionStatus: "active" });
+      if (!next.billingProvider) Mockflix.setState({ billingProvider: "direct" });
+
+      window.location.href = "browse.html" + (Mockflix.isTestMode() ? "?test=1" : "");
+    });
+  </script>
+</body>
+</html>

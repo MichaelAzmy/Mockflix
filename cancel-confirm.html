@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockflix — Confirm Cancellation</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+
+  <div class="container">
+    <section class="hero">
+      <h1 class="h-title">Confirm cancellation</h1>
+      <p class="h-sub" id="subtext"></p>
+    </section>
+
+    <div class="card panel loading-wrap" id="page">
+      <div class="spinner"><div class="spin" aria-label="Loading"></div></div>
+
+      <div class="content">
+        <div class="notice" id="details"></div>
+
+        <div class="hr"></div>
+
+        <div class="footer-actions">
+          <a class="btn btn-ghost left" href="cancel.html">Back</a>
+          <button class="btn btn-ghost" id="keepBtn" data-testid="keep-membership">Keep membership</button>
+          <button class="btn" id="finishBtn" data-testid="finish-cancellation" aria-label="Finish cancellation">
+            Finish cancellation
+          </button>
+        </div>
+
+        <p class="small muted">
+          You can restart anytime before your access ends.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    Mockflix.requireLogin();
+    Mockflix.injectTopbar("account");
+
+    const s = Mockflix.loadState();
+    if (s.billingProvider !== "direct") window.location.href = "membership.html";
+
+    const end = Mockflix.fmtDate(s.renewalDateISO);
+    document.getElementById("subtext").textContent = `You’ll keep access until ${end}.`;
+    document.getElementById("details").innerHTML =
+      `By confirming, your membership will end at the close of your current billing period (<strong>${end}</strong>).`;
+
+    document.getElementById("keepBtn").addEventListener("click", async (e) => {
+      Mockflix.disableBriefly(e.currentTarget);
+      Mockflix.setLoading("page");
+      await Mockflix.realisticDelay();
+      window.location.href = "membership.html" + (Mockflix.isTestMode() ? "?test=1" : "");
+    });
+
+    document.getElementById("finishBtn").addEventListener("click", async (e) => {
+      Mockflix.disableBriefly(e.currentTarget);
+      Mockflix.setLoading("page");
+      await Mockflix.realisticDelay();
+      Mockflix.setState({ subscriptionStatus: "cancelled" });
+      window.location.href = "cancel-done.html" + (Mockflix.isTestMode() ? "?test=1" : "");
+    });
+
+    Mockflix.setLoading("page");
+    Mockflix.realisticDelay().then(() => Mockflix.clearLoading("page"));
+  </script>
+</body>
+</html>

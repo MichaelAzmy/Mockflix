@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockflix — Feedback</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+
+  <div class="container">
+    <section class="hero">
+      <h1 class="h-title">Help us improve</h1>
+      <p class="h-sub">Optional — why are you cancelling?</p>
+    </section>
+
+    <div class="card panel loading-wrap" id="page">
+      <div class="spinner"><div class="spin" aria-label="Loading"></div></div>
+      <div class="content">
+        <form id="reasonForm" class="form">
+          <div>
+            <label for="reason">Reason</label>
+            <select id="reason" data-testid="cancel-reason">
+              <option value="too-expensive">Too expensive</option>
+              <option value="not-enough">Not enough to watch</option>
+              <option value="technical">Technical issues</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="notes">Anything else? (optional)</label>
+            <textarea id="notes" rows="3" placeholder="Tell us more…" data-testid="cancel-notes"></textarea>
+          </div>
+
+          <div class="footer-actions">
+            <a class="btn btn-ghost left" href="cancel.html">Back</a>
+            <button class="btn" type="submit" data-testid="reason-continue">Continue</button>
+          </div>
+
+          <p class="small muted">
+            This step is skippable in the real world; your agents should handle optional forms gracefully.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    Mockflix.requireLogin();
+    Mockflix.injectTopbar("account");
+
+    Mockflix.setLoading("page");
+    Mockflix.realisticDelay().then(() => Mockflix.clearLoading("page"));
+
+    document.getElementById("reasonForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = e.submitter;
+      Mockflix.disableBriefly(btn);
+      Mockflix.setLoading("page");
+      await Mockflix.realisticDelay();
+
+      // store feedback (not used, but realistic)
+      Mockflix.setState({
+        lastCancelReason: document.getElementById("reason").value
+      });
+
+      window.location.href = "cancel-confirm.html" + (Mockflix.isTestMode() ? "?test=1" : "");
+    });
+  </script>
+</body>
+</html>
